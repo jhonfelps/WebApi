@@ -11,14 +11,14 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
-    public class UsuarioController : ApiController
+    public class ProductoController : ApiController
     {
         public HttpResponseMessage Get()
         {
             try
             {
                 string query = @"
-                select * from usuarios";
+                select * from productos";
                 DataTable table = new DataTable();
                 using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["UsuariosCv"].ConnectionString))
                 using (var cmd = new SqlCommand(query, con))
@@ -27,7 +27,7 @@ namespace WebApi.Controllers
                     cmd.CommandType = CommandType.Text;
                     da.Fill(table);
                 }
-                if (table.Rows.Count > 1)
+                if (table.Rows.Count > 0)
                 {
                     return Request.CreateResponse(HttpStatusCode.OK, table);
                 }
@@ -44,20 +44,19 @@ namespace WebApi.Controllers
 
 
         }
-        public string Post(Usuario usuario)
+        public string Post(Producto producto)
         {
             try
             {
-                if(usuario.Nombre is null || usuario.Apellido is null || usuario.Correo is null
-                    || usuario.Tipo_Documento is null || usuario.Documento is null
-                    || usuario.Correo is null || usuario.Clave is null || usuario.Rol is null)
+                if (producto.Codigo < 1 || producto.Nombre is null || producto.Descripcion is null
+                    || producto.Precio < 1 || producto.Imagen is null)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, "Faltan campos obligatorios.").ToString();
                 }
                 string query = @"
-                   insert into dbo.usuarios (Nombre, Apellido, Tipo_documento, Documento, Clave, Correo) values
-                    ('" + usuario.Nombre+ @"', '" + usuario.Apellido + @"', '" + usuario.Tipo_Documento + @"',
-                    '" + usuario.Documento + @"','" + usuario.Clave + @"','" + usuario.Correo + @"','" + usuario.Rol + @"')
+                   insert into dbo.productos (Codigo, Nombre, Descripcion, Precio, Imagen) values
+                    ('" + producto.Codigo + @"', '" + producto.Nombre + @"', '" + producto.Descripcion + @"',
+                    '" + producto.Precio + @"','" + producto.Imagen + @"')
                 ";
                 DataTable table = new DataTable();
                 using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["UsuariosCv"].ConnectionString))
@@ -69,31 +68,27 @@ namespace WebApi.Controllers
                 }
                 return "Added Succsessfully!!";
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return "Failed to Added!";
                 throw;
             }
         }
-        public string Put(Usuario usuario)
+        public string Put(Producto producto)
         {
-            if (usuario.Id < 1 || usuario.Nombre is null || usuario.Apellido is null || usuario.Correo is null
-                    || usuario.Tipo_Documento is null || usuario.Documento is null
-                    || usuario.Correo is null || usuario.Clave is null || usuario.Rol is null)
+            if (producto.Codigo < 1 || producto.Nombre is null || producto.Descripcion is null
+                    || producto.Precio < 1 || producto.Imagen is null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Faltan campos obligatorios.").ToString();
             }
             try
             {
                 string query = @"
-                   update dbo.usuarios set Nombre ='" + usuario.Nombre + @"',
-                    Apellido = '" + usuario.Apellido + @"',
-                    Tipo_documento = '" + usuario.Tipo_Documento + @"',
-                    Documento = '" + usuario.Documento + @"',
-                    Clave = '" + usuario.Clave + @"',
-                    Correo = '" + usuario.Correo + @"',
-                    Rol = '" + usuario.Rol + @"'
-                    Where id = " + usuario.Id+@"
+                   update dbo.productos set Nombre ='" + producto.Nombre + @"',
+                    Descripcion = '" + producto.Descripcion + @"',
+                    Precio = '" + producto.Precio + @"',
+                    Imagen = '" + producto.Imagen + @"'
+                    Where Codigo = " + producto.Codigo + @"
                 ";
                 DataTable table = new DataTable();
                 using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["UsuariosCv"].ConnectionString))
@@ -116,10 +111,10 @@ namespace WebApi.Controllers
             try
             {
                 string query = @"
-                   delete from dbo.usuarios Where id = " + id + @"
+                   delete from dbo.productos Where Codigo = " + id + @"
                 ";
                 DataTable table = new DataTable();
-                using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["UsuariosCv"].ConnectionString))
+                using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["ProductosCv"].ConnectionString))
                 using (var cmd = new SqlCommand(query, con))
                 using (var da = new SqlDataAdapter(cmd))
                 {

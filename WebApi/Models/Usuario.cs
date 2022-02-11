@@ -22,5 +22,7 @@ namespace WebApi.Models
         public string Clave { get; set; }
         [Required]
         public string Correo { get; set; }
+        [Required]
+        public string Rol { get; set; }
     }
 }
